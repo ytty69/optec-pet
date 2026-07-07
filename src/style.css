@@ -1,0 +1,448 @@
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+}
+
+body {
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.pet-stage {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+}
+
+.pet-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Adoption UI overlay */
+.picker-bar {
+  position: fixed;
+  left: 50%;
+  top: calc(50% + 145px);
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+/* Wooden pixel-art button matching the dialog panel style. */
+.picker-confirm {
+  padding: 10px 32px;
+  border-radius: 6px;
+  border: 2px solid #d4a942;
+  background: #6b4423;
+  color: #fef7e0;
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  cursor: pointer;
+  box-shadow:
+    inset 0 -3px 0 rgba(0, 0, 0, 0.35),
+    inset 0 2px 0 rgba(255, 255, 255, 0.08),
+    0 4px 0 #3a2410;
+  font-family: system-ui, -apple-system, sans-serif;
+  image-rendering: pixelated;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+
+.picker-confirm:hover:not(:disabled) {
+  background: #7d5028;
+}
+
+.picker-confirm:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 -3px 0 rgba(0, 0, 0, 0.35),
+    inset 0 2px 0 rgba(255, 255, 255, 0.08),
+    0 2px 0 #3a2410;
+}
+
+.picker-confirm:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+}
+
+/* Floating cancel button shown only during "换一只" flow. */
+.cancel-readopt {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 15;
+  padding: 8px 18px;
+  background: rgba(58, 36, 16, 0.9);
+  color: #fef7e0;
+  border: 2px solid #d4a942;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  cursor: pointer;
+  font-family: system-ui, -apple-system, sans-serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: background 0.1s, transform 0.08s;
+}
+
+.cancel-readopt:hover {
+  background: rgba(107, 68, 35, 0.95);
+}
+
+.cancel-readopt:active {
+  transform: translateY(1px);
+}
+
+/* Naming modal — matches the wooden dialog theme */
+.name-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.name-modal {
+  min-width: 320px;
+  padding: 22px 28px 20px;
+  background: #1a1408;
+  border: 3px solid #d4a942;
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+  color: #fef7e0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.name-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffde3b;
+  letter-spacing: 1px;
+}
+
+.name-input {
+  width: 240px;
+  padding: 8px 12px;
+  background: #2d2416;
+  border: 2px solid #6b4423;
+  border-radius: 4px;
+  color: #fef7e0;
+  font-size: 16px;
+  font-family: system-ui, sans-serif;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.name-input:focus {
+  border-color: #d4a942;
+}
+
+.name-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.name-btn {
+  padding: 8px 22px;
+  border-radius: 4px;
+  border: 2px solid #d4a942;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.1s;
+}
+
+.name-btn-primary {
+  background: #6b4423;
+  color: #fef7e0;
+}
+
+.name-btn-primary:hover {
+  background: #7d5028;
+}
+
+.name-btn-secondary {
+  background: transparent;
+  color: #d4a942;
+  border-color: #6b4423;
+}
+
+.name-btn-secondary:hover {
+  background: rgba(107, 68, 35, 0.4);
+}
+
+/* Adoption manual — parchment panel that expands from the envelope. */
+.manual-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  animation: manual-fade-in 0.3s ease-out both;
+}
+
+.manual-panel {
+  position: relative;
+  max-width: 560px;
+  width: min(560px, 90vw);
+  max-height: 85vh;
+  overflow-y: auto;
+  background: #fef7e0;
+  color: #3a2410;
+  padding: 32px 40px 28px;
+  border-radius: 8px;
+  border: 4px solid #d4a942;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.55),
+    inset 0 0 40px rgba(212, 169, 66, 0.18);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  transform-origin: center;
+  animation: manual-expand 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes manual-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes manual-expand {
+  0%   { transform: scale(0.15); opacity: 0; }
+  55%  { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.manual-header {
+  text-align: center;
+  padding-bottom: 18px;
+  border-bottom: 2px dashed rgba(58, 36, 16, 0.25);
+  margin-bottom: 18px;
+}
+
+.manual-logo {
+  display: block;
+  width: 88px;
+  height: 88px;
+  margin: -4px auto 12px;
+  image-rendering: pixelated;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(58, 36, 16, 0.35);
+}
+
+.manual-header h1 {
+  margin: 0 0 10px;
+  font-size: 22px;
+  color: #6b4423;
+  letter-spacing: 2px;
+}
+
+.manual-sub {
+  margin: 0;
+  font-size: 13px;
+  color: #6b5a4a;
+  line-height: 1.7;
+}
+
+.manual-section h2 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  color: #6b4423;
+  letter-spacing: 1px;
+}
+
+.manual-section ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.manual-section li {
+  padding: 10px 0 10px 24px;
+  position: relative;
+  font-size: 13.5px;
+  line-height: 1.75;
+  border-bottom: 1px dashed rgba(58, 36, 16, 0.15);
+}
+
+.manual-section li::before {
+  content: '🐾';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  font-size: 12px;
+}
+
+.manual-section li:last-child {
+  border-bottom: none;
+}
+
+.manual-section li strong {
+  color: #6b4423;
+  margin-right: 4px;
+}
+
+.manual-footer {
+  text-align: center;
+  margin-top: 22px;
+}
+
+.manual-blessing {
+  font-size: 15px;
+  margin: 0 0 18px;
+  letter-spacing: 4px;
+}
+
+.manual-button {
+  padding: 12px 40px;
+  background: #6b4423;
+  color: #fef7e0;
+  border: 2px solid #d4a942;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 3px;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow:
+    inset 0 -3px 0 rgba(0, 0, 0, 0.35),
+    inset 0 2px 0 rgba(255, 255, 255, 0.08),
+    0 4px 0 #3a2410;
+  transition: transform 0.08s, background 0.1s;
+}
+
+.manual-button:hover {
+  background: #7d5028;
+}
+
+.manual-button:active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 -3px 0 rgba(0, 0, 0, 0.35),
+    inset 0 2px 0 rgba(255, 255, 255, 0.08),
+    0 2px 0 #3a2410;
+}
+
+/* Debug overlay */
+.debug-overlay {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  min-width: 320px;
+  max-width: 480px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #e0f2ff;
+  font-family: Consolas, "Cascadia Code", "SF Mono", monospace;
+  font-size: 11px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+}
+
+.debug-header {
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffde3b;
+}
+
+.debug-header b {
+  color: #fff;
+  font-weight: normal;
+  background: rgba(255, 222, 59, 0.15);
+  padding: 0 4px;
+  border-radius: 3px;
+}
+
+.debug-logs {
+  max-height: 260px;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+.debug-empty {
+  color: #888;
+  font-style: italic;
+}
+
+.debug-hint {
+  color: #888;
+  font-size: 10px;
+  margin-left: 6px;
+}
+
+/* Right-click menu on pet */
+.pet-menu {
+  position: fixed;
+  z-index: 50;
+  min-width: 168px;
+  background: rgba(28, 28, 34, 0.96);
+  color: #f5f5f7;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  padding: 6px;
+  font-size: 13px;
+  backdrop-filter: blur(8px);
+}
+
+.pet-menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pet-menu-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pet-menu-item:active {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.pet-menu-danger {
+  color: #ff8a8a;
+}
+
+.pet-menu-danger:hover {
+  background: rgba(255, 100, 100, 0.15);
+}
+
+.pet-menu-kbd {
+  color: #888;
+  font-family: Consolas, monospace;
+  font-size: 11px;
+}
+
+.pet-menu-sep {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 4px 6px;
+}
